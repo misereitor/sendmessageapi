@@ -2,25 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "client_id": { "type": "number" },
-    "client_key": { "type": "string" },
-    "pacient_id": { "type": "number" },
-    "paciente_name": { "type": "string" },
     "number_phone": { "type": "string" },
-    "process_name": { "type": "string" },
-    "process_nb": { "type": "string" },
-    "whatsapp_id": { "type": "string" },
-    "schedule": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "timestamp_date": {"type": "string"},
-          "message": {"type":"string"}
-        },
-        "required": ["timestamp_date", "message"]
-      }
-    }
+    "process_number": { "type": "number" },
+    "paciente_name": { "type": "string" },
+    "recurrence": { "type": "number" }
   },
-  "required": ["client_id", "client_key","pacient_id","paciente_name","number_phone","process_name","process_nb","whatsapp_id","schedule"]
+  "required": ["number_phone", "process_number","paciente_name","recurrence"]
 }

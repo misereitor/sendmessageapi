@@ -1,36 +1,33 @@
-import { EventBridgeClient, PutEventsCommand, PutEventsCommandOutput } from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient, PutEventsCommand, PutEventsCommandInput, PutEventsCommandOutput } from '@aws-sdk/client-eventbridge';
 import { CreateItemBody } from '../interfaces/bodyRequest';
 import { eventBridgeParamsRequest } from '../interfaces/createEvent';
 
 const eventBridgeClient = new EventBridgeClient({region: "us-east-2"});
 
-export const configureItemSchedule = async (event: CreateItemBody): Promise<PutEventsCommandOutput[]> => {
-  const eventParams = event.schedule.map( async (schedule) => {
-    const eventbridge: eventBridgeParamsRequest = {
-      source: "my.cloudformation",
-      Detail: {
-        message: schedule.message,
-        phoneNumber: event.number_phone
-      },
-      detailType: "create_event",
-      eventBusName: "default",
-      time: new Date(schedule.timestamp_date)
-    }
-    const createEvent = await createItemSchedule(eventbridge);
-    return createEvent;
-  })
-  return Promise.all(eventParams);
+export const configureItemSchedule = async (event: CreateItemBody): Promise<PutEventsCommandOutput> => {
+  const date = new Date();
+  const addThirtySeconds = date.setTime(date.getTime() + 30000)
+  const eventParams: eventBridgeParamsRequest = {
+    time: new Date(addThirtySeconds),
+    source: "my.apisource",
+    detailType: "create_event",
+    eventBusName: "default",
+    Detail: JSON.stringify(event)
+  }
+  console.log(eventParams);
+  const createEvent = await createItemSchedule(eventParams);
+  return createEvent;
 };
 
 const createItemSchedule = async (parameter: eventBridgeParamsRequest): Promise<PutEventsCommandOutput> => {
-  const eventParams = {
+  const eventParams: PutEventsCommandInput = {
     Entries: [
       {
+        Time: parameter.time,
         Source: parameter.source,
         EventBusName: parameter.eventBusName, 
         DetailType: parameter.detailType,
-        Time: parameter.time,
-        Detail: JSON.stringify(parameter.Detail),
+        Detail: parameter.Detail
       },
     ],
   };
