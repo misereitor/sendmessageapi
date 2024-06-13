@@ -1,0 +1,62 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: clidonto
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: clidontoaws
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: clidonto
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - 'events:PutEvents'
+      Resource: '*'
+
+functions:
+  receiveAppointment:
+    name: receiveAppointment
+    handler: src/router/receiveAppointment.receiveAppointment
+    events:
+      - http:
+          path: /scheduleMessages/schedule
+          method: post
+          cors: true
+          request:
+            schemas:
+              application/json: ${file(schemas/create-item-schema.json)}
+  sendMessageWhatsapp:
+    name: sendMessageWhatsapp
+    handler: src/router/sendMessageWhatsapp.sendMessageWhatsapp
+    events:
+      - http:
+          path: /send/sendmessage
+          method: post
+          cors: true
+          # request:
+          #   schemas:
+          #     application/json: ${file(schemas/send-message-whatsapp.json)}
+
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+
+package:
+  exclude:
+    - node_modules/**
+    - .vscode/**
+    - .idea/**
+    - .gitignore
+    - .git/**
+    - README.md

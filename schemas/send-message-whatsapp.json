@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "number_phone": { "type": "string" },
+    "message": {"type":"string"}
+  },
+  "required": ["number_phone", "message"]
+}
